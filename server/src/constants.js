@@ -1,0 +1,3 @@
+const DEPARTMENTS = ['IT_SUPPORT', 'FACILITIES', 'ADMINISTRATION']
+
+module.exports = { DEPARTMENTS }
