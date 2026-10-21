@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "node --watch src/index.js",
     "seed:users": "node src/seed/seedUsers.js",
-    "train": "node src/ml/train.js"
+    "train": "node src/ml/train.js",
+    "seed:issues": "node src/seed/seedIssues.js"
   },
   "keywords": [],
   "author": "",

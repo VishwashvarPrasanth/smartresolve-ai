@@ -9,6 +9,7 @@ const { STATUSES, PRIORITIES, DEPARTMENTS } = require('../constants')
 const isObjectId = (id) => typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id)
 const { classifyText } = require('../ml/classifier')
 const { findStaffForDepartment } = require('../utils/assign')
+const { withSla } = require('../utils/sla')
 
 const validateIssueInput = (body) => {
   const errors = []
@@ -136,13 +137,12 @@ const createIssue = async (req, res) => {
 
 const listIssues = async (req, res) => {
   try {
-    const allowedKeys = ['status', 'priority', 'department']
+    const allowedKeys = ['status', 'priority', 'department', 'queue', 'overdue']    
     const badKey = Object.keys(req.query).find((key) => !allowedKeys.includes(key))
     if (badKey) {
         return res.status(400).json({ message: 'Invalid filter' })
     }
-    const { status, priority, department } = req.query
-
+    const { status, priority, department, queue, overdue } = req.query
     // Filters must be plain text from our allowed lists. This blocks NoSQL injection.
     if (status !== undefined && !(typeof status === 'string' && STATUSES.includes(status))) {
       return res.status(400).json({ message: 'Invalid status filter' })
@@ -164,9 +164,24 @@ const listIssues = async (req, res) => {
     } else if (department) {
       filter.department = department // only the admin can pick a department
     }
+    if (queue !== undefined && queue !== 'routing') {
+        return res.status(400).json({ message: 'Invalid queue filter' })
+    }
+    if (queue === 'routing' && req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Access denied' })
+    }
+    if (overdue !== undefined && overdue !== 'true') {
+        return res.status(400).json({ message: 'Invalid overdue filter' })
+    }
+
 
     if (status) filter.status = status
     if (priority) filter.priority = priority
+
+    if (queue === 'routing') {
+        filter.status = 'OPEN'
+        filter.assignee = null // matches tickets that have no owner
+    }
 
     const issues = await Issue.find(filter)
       .sort({ createdAt: -1 })
@@ -174,7 +189,12 @@ const listIssues = async (req, res) => {
       .populate('reporter', 'name')
       .populate('assignee', 'name department')
 
-    res.status(200).json({ count: issues.length, issues })
+    const now = new Date()
+    let result = issues.map((i) => withSla(i, now))
+    if (overdue === 'true') {
+    result = result.filter((i) => i.sla.overdue)
+    }
+    res.status(200).json({ count: result.length, issues: result })
   } catch (error) {
     console.error(error)
     res.status(500).json({ message: 'Something went wrong. Please try again.' })
@@ -202,7 +222,7 @@ const getIssueById = async (req, res) => {
       return res.status(403).json({ message: 'Access denied' })
     }
 
-    res.status(200).json({ issue })
+    res.status(200).json({ issue: withSla(issue, new Date()) })
   } catch (error) {
     console.error(error)
     res.status(500).json({ message: 'Something went wrong. Please try again.' })

@@ -7,6 +7,8 @@ const authRoutes = require('./routes/authRoutes')
 const issueRoutes = require('./routes/issueRoutes')
 const { getMe } = require('./controllers/authController')
 const { requireAuth } = require('./middleware/auth')
+const adminRoutes = require('./routes/adminRoutes')
+const analyticsRoutes = require('./routes/analyticsRoutes')
 
 const app = express()
 app.use(cors())
@@ -19,6 +21,8 @@ app.get('/health', (req, res) => {
 app.use('/auth', authRoutes)
 app.get('/me', requireAuth, getMe)
 app.use('/issues', issueRoutes)
+app.use('/admin', adminRoutes)
+app.use('/analytics', analyticsRoutes)
 
 const PORT = process.env.PORT || 5000
 
