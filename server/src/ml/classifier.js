@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const { predict } = require('./naiveBayes')
 
-const CONFIDENCE_THRESHOLD = 0.65 // a starting value. We can tune it.
+const CONFIDENCE_THRESHOLD = 0.75 // a starting value. We can tune it.
 const MIN_KNOWN_WORDS = 2
 
 let model = null

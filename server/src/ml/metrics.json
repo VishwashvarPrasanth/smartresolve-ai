@@ -1,0 +1,71 @@
+{
+  "modelVersion": "1.0",
+  "trainedAt": "2026-10-21T03:30:07.203Z",
+  "datasetRevision": 1,
+  "trainCount": 60,
+  "testCount": 30,
+  "accuracy": 0.8,
+  "perClass": {
+    "IT_SUPPORT": {
+      "precision": 0.9,
+      "recall": 0.9
+    },
+    "FACILITIES": {
+      "precision": 0.7777777777777778,
+      "recall": 0.7
+    },
+    "ADMINISTRATION": {
+      "precision": 0.7272727272727273,
+      "recall": 0.8
+    }
+  },
+  "confusion": {
+    "IT_SUPPORT": {
+      "IT_SUPPORT": 9,
+      "FACILITIES": 0,
+      "ADMINISTRATION": 1
+    },
+    "FACILITIES": {
+      "IT_SUPPORT": 1,
+      "FACILITIES": 7,
+      "ADMINISTRATION": 2
+    },
+    "ADMINISTRATION": {
+      "IT_SUPPORT": 0,
+      "FACILITIES": 2,
+      "ADMINISTRATION": 8
+    }
+  },
+  "mistakes": [
+    {
+      "text": "Software access request for the design tool for final year students",
+      "actual": "IT_SUPPORT",
+      "predicted": "ADMINISTRATION"
+    },
+    {
+      "text": "Bulbs are fused in the lab corridor and it is dark",
+      "actual": "FACILITIES",
+      "predicted": "IT_SUPPORT"
+    },
+    {
+      "text": "The lift is stuck between floors and needs repair",
+      "actual": "FACILITIES",
+      "predicted": "ADMINISTRATION"
+    },
+    {
+      "text": "Roof is leaking in the exam hall when it rains",
+      "actual": "FACILITIES",
+      "predicted": "ADMINISTRATION"
+    },
+    {
+      "text": "Please allot a classroom for the placement training session",
+      "actual": "ADMINISTRATION",
+      "predicted": "FACILITIES"
+    },
+    {
+      "text": "Hostel room allotment letter has not been given",
+      "actual": "ADMINISTRATION",
+      "predicted": "FACILITIES"
+    }
+  ]
+}

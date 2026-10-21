@@ -7,6 +7,8 @@ const ActivityLog = require('../models/ActivityLog')
 const { canViewIssue } = require('../utils/access')
 const { STATUSES, PRIORITIES, DEPARTMENTS } = require('../constants')
 const isObjectId = (id) => typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id)
+const { classifyText } = require('../ml/classifier')
+const { findStaffForDepartment } = require('../utils/assign')
 
 const validateIssueInput = (body) => {
   const errors = []
@@ -83,6 +85,43 @@ const createIssue = async (req, res) => {
       after: `${priority} (score ${score})`,
       reason: reasons.join('; '),
     })
+    const result = classifyText(`${title} ${description}`)
+    issue.predictedDepartment = result.department
+    issue.predictionConfidence = result.confidence
+    issue.needsReview = result.needsReview
+
+    await logActivity({
+      issue: issue._id,
+      action: 'CLASSIFIED',
+      after: `Suggested ${result.department} (confidence ${result.confidence})`,
+      reason: result.needsReview
+        ? 'Low confidence: sent to Needs Review for the admin'
+        : 'Confidence is enough for automatic routing',
+    })
+
+    if (!result.needsReview) {
+      const staff = await findStaffForDepartment(result.department)
+      if (staff) {
+        issue.department = result.department
+        issue.assignee = staff._id
+        issue.status = 'ASSIGNED'
+        await logActivity({
+          issue: issue._id,
+          action: 'ASSIGNED',
+          before: 'OPEN',
+          after: `ASSIGNED to ${staff.name}`,
+          reason: 'Lowest workload in the department',
+        })
+      } else {
+        await logActivity({
+          issue: issue._id,
+          action: 'NO_STAFF_AVAILABLE',
+          reason: 'No active staff in this department. Waiting for the admin.',
+        })
+      }
+    }
+
+    await issue.save()
 
     const emergencyNotice = hazard
       ? 'This looks like a safety hazard. Please contact the college emergency staff immediately. This app only tracks the issue. It does not send help.'
