@@ -4,6 +4,7 @@ const express = require('express')
 const cors = require('cors')
 const { connectDB } = require('./db')
 const authRoutes = require('./routes/authRoutes')
+const issueRoutes = require('./routes/issueRoutes')
 const { getMe } = require('./controllers/authController')
 const { requireAuth } = require('./middleware/auth')
 
@@ -17,6 +18,7 @@ app.get('/health', (req, res) => {
 
 app.use('/auth', authRoutes)
 app.get('/me', requireAuth, getMe)
+app.use('/issues', issueRoutes)
 
 const PORT = process.env.PORT || 5000
 

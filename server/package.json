@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "node --watch src/index.js",
-    "seed:users": "node src/seed/seedUsers.js"
+    "seed:users": "node src/seed/seedUsers.js",
+    "train": "node src/ml/train.js"
   },
   "keywords": [],
   "author": "",
