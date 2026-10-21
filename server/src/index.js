@@ -9,9 +9,20 @@ const { getMe } = require('./controllers/authController')
 const { requireAuth } = require('./middleware/auth')
 const adminRoutes = require('./routes/adminRoutes')
 const analyticsRoutes = require('./routes/analyticsRoutes')
+const rateLimit = require('express-rate-limit')
 
 const app = express()
-app.use(cors())
+app.set('trust proxy', 1)
+
+const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173').split(',')
+app.use(cors({ origin: allowedOrigins }))
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  message: { message: 'Too many login attempts. Please try again later.' },
+})
+app.use('/auth/login', loginLimiter)
 app.use(express.json({ limit: '20kb' }))
 
 app.get('/health', (req, res) => {
