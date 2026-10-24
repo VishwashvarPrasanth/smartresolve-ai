@@ -206,3 +206,7 @@ variables. The `.env` file is not in the repository. Users see simple error mess
 - Analytics are plain numbers and tables. There are no charts.
 - Emergency guidance shows when the hazard box is ticked. We do not scan the text for danger words.
 - No password reset, no email, no notifications (out of scope in the brief).
+
+YOUR_CLOUDFLARE_LINK => https://smartresolve-ai.vishwashvarprasanth1874.workers.dev
+
+YOUR_GITHUB_LINK => https://github.com/VishwashvarPrasanth/smartresolve-ai
