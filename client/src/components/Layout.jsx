@@ -16,6 +16,7 @@ const LINKS = {
     ['/admin/routing', 'Routing Queue'],
     ['/admin/issues', 'All Issues'],
     ['/admin/analytics', 'Analytics'],
+    ['/admin/staff', 'Staff Accounts'],
     ['/report', 'Report (test)'],
   ],
 }

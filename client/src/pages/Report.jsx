@@ -87,6 +87,32 @@ export default function Report() {
           </ul>
         </div>
         <div className="flex gap-4">
+                  <div>
+          <h2 className="font-semibold">Possible existing issues</h2>
+          {i.duplicateSuggestions && i.duplicateSuggestions.length > 0 ? (
+            <div>
+              <p className="text-sm">
+                These open tickets look similar. Your ticket was still saved. Nothing was merged or
+                deleted. An admin can link them later.
+              </p>
+              <ul className="space-y-2 mt-2">
+                {i.duplicateSuggestions.map((d) => (
+                  <li key={d.ticketId} className="border rounded p-2 text-sm">
+                    <div>
+                      <strong>{d.ticketId}</strong>: {d.title} <StatusBadge status={d.status} />
+                    </div>
+                    <div>{d.building}, {d.room} — match {Math.round(d.score * 100)}%</div>
+                    <ul className="list-disc ml-5">
+                      {d.reasons.map((r, idx) => <li key={idx}>{r}</li>)}
+                    </ul>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <p className="text-sm">No similar open tickets were found.</p>
+          )}
+        </div>  
           <Link to={`/issues/${i._id}`} className="underline text-blue-700">Open this ticket</Link>
           <button onClick={() => { setResult(null); setF(empty) }} className="underline text-blue-700">
             Report another issue

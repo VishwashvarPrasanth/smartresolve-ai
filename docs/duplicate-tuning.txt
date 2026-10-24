@@ -1,0 +1,13 @@
+﻿
+Same Wi-Fi problem in new words (SR-000100 should be suggested)
+  SR-000100 score 0.96 -> SUGGESTED
+  SR-000102 score 0.48 (below 0.55, not shown)
+  SR-000101 score 0.2 (below 0.55, not shown)
+
+Unrelated Facilities problem (nothing should be suggested)
+  (no candidate passed the building and department checks)
+
+Different IT problem in another room (should be below 0.55)
+  SR-000101 score 0.31 (below 0.55, not shown)
+  SR-000100 score 0.25 (below 0.55, not shown)
+  SR-000102 score 0.14 (below 0.55, not shown)

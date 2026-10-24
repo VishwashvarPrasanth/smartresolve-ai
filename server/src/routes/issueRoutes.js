@@ -9,6 +9,7 @@ const {
   updateStatus,
   assignIssue,
   changePriority,
+  linkDuplicate,
 } = require('../controllers/workflowController')
 const { requireAuth, requireRole } = require('../middleware/auth')
 
@@ -22,6 +23,6 @@ router.get('/:id/activity', requireAuth, getIssueActivity)
 router.patch('/:id/status', requireAuth, updateStatus)
 router.patch('/:id/assignment', requireAuth, requireRole('admin'), assignIssue)
 router.patch('/:id/priority', requireAuth, requireRole('staff', 'admin'), changePriority)
+router.patch('/:id/duplicates', requireAuth, requireRole('admin'), linkDuplicate)
 
 module.exports = router
-

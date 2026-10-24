@@ -1,0 +1,7 @@
+﻿cut-off 0.65: auto-routed 23 of 30, correct 23
+cut-off 0.7: auto-routed 21 of 30, correct 21
+cut-off 0.75: auto-routed 19 of 30, correct 19
+cut-off 0.8: auto-routed 16 of 30, correct 16
+cut-off 0.85: auto-routed 15 of 30, correct 15
+cut-off 0.9: auto-routed 8 of 30, correct 8
+Unclear ticket confidence: 0.67

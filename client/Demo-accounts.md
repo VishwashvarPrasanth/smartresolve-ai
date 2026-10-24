@@ -1,0 +1,10 @@
+  { name: 'Admin', email: 'admin@smartresolve.test', role: 'admin' },
+  { name: 'IT Staff 1', email: 'it1@smartresolve.test', role: 'staff', department: 'IT_SUPPORT' },
+  { name: 'IT Staff 2', email: 'it2@smartresolve.test', role: 'staff', department: 'IT_SUPPORT' },
+  { name: 'Facilities Staff 1', email: 'fac1@smartresolve.test', role: 'staff', department: 'FACILITIES' },
+  { name: 'Facilities Staff 2', email: 'fac2@smartresolve.test', role: 'staff', department: 'FACILITIES' },
+  { name: 'Admin Office Staff 1', email: 'adm1@smartresolve.test', role: 'staff', department: 'ADMINISTRATION' },
+  { name: 'Admin Office Staff 2', email: 'adm2@smartresolve.test', role: 'staff', department: 'ADMINISTRATION' },
+  { name: 'Reporter A', email: 'reporter.a@smartresolve.test', role: 'reporter' },
+  { name: 'Reporter B', email: 'reporter.b@smartresolve.test', role: 'reporter' },
+

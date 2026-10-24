@@ -10,6 +10,7 @@ const isObjectId = (id) => typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id
 const { classifyText } = require('../ml/classifier')
 const { findStaffForDepartment } = require('../utils/assign')
 const { withSla } = require('../utils/sla')
+const { findDuplicates } = require('../ml/duplicates')
 
 const validateIssueInput = (body) => {
   const errors = []
@@ -122,6 +123,37 @@ const createIssue = async (req, res) => {
       }
     }
 
+    // Duplicate suggestions. This never merges or deletes any ticket.
+    const candidates = await Issue.find({
+      _id: { $ne: issue._id },
+      building: issue.building,
+      status: { $in: ['OPEN', 'ASSIGNED', 'IN_PROGRESS'] },
+    })
+      .sort({ createdAt: -1 })
+      .limit(200)
+      .select('ticketId title description building room department predictedDepartment status')
+
+    const duplicates = findDuplicates(
+      {
+        title: issue.title,
+        description: issue.description,
+        building: issue.building,
+        room: issue.room,
+        department: result.needsReview ? null : result.department,
+      },
+      candidates
+    )
+
+    issue.duplicateSuggestions = duplicates
+    if (duplicates.length > 0) {
+      await logActivity({
+        issue: issue._id,
+        action: 'DUPLICATE_SUGGESTED',
+        after: duplicates.map((d) => d.ticketId).join(', '),
+        reason: 'Possible similar open tickets. Nothing was merged or deleted.',
+      })
+    }
+
     await issue.save()
 
     const emergencyNotice = hazard
@@ -211,6 +243,7 @@ const getIssueById = async (req, res) => {
     const issue = await Issue.findById(id)
       .populate('reporter', 'name')
       .populate('assignee', 'name department')
+      .populate('duplicateLinks', 'ticketId title status')
     if (!issue) {
       return res.status(404).json({ message: 'Ticket not found' })
     }
@@ -222,7 +255,9 @@ const getIssueById = async (req, res) => {
       return res.status(403).json({ message: 'Access denied' })
     }
 
-    res.status(200).json({ issue: withSla(issue, new Date()) })
+    const output = withSla(issue, new Date())
+    if (req.user.role !== 'admin') output.duplicateLinks = [] // only the admin sees linked tickets
+    res.status(200).json({ issue: output })
   } catch (error) {
     console.error(error)
     res.status(500).json({ message: 'Something went wrong. Please try again.' })

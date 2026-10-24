@@ -229,6 +229,7 @@ const listStaff = async (req, res) => {
       staff.map(async (s) => ({
         id: s._id,
         name: s.name,
+        email: s.email,
         department: s.department,
         active: s.active,
         activeTickets: await Issue.countDocuments({
@@ -243,4 +244,55 @@ const listStaff = async (req, res) => {
   }
 }
 
-module.exports = { updateStatus, assignIssue, changePriority, listStaff }
+// Admin only: link two tickets as possible duplicates. Both tickets stay. Nothing is merged or deleted.
+const linkDuplicate = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { otherId } = req.body || {}
+    const reason = clean(req.body && req.body.reason)
+
+    if (!isObjectId(id) || !isObjectId(otherId)) {
+      return res.status(400).json({ message: 'Invalid ticket id' })
+    }
+    if (id === otherId) {
+      return res.status(400).json({ message: 'A ticket cannot be linked to itself' })
+    }
+    if (reason.length < 3) {
+      return res.status(400).json({ message: 'Please give a reason' })
+    }
+
+    const [a, b] = await Promise.all([Issue.findById(id), Issue.findById(otherId)])
+    if (!a || !b) {
+      return res.status(404).json({ message: 'Ticket not found' })
+    }
+    if (a.duplicateLinks.some((x) => x.toString() === b._id.toString())) {
+      return res.status(409).json({ message: 'These tickets are already linked' })
+    }
+
+    a.duplicateLinks.push(b._id)
+    b.duplicateLinks.push(a._id)
+    await a.save()
+    await b.save()
+
+    await logActivity({
+      issue: a._id,
+      actor: req.user._id,
+      action: 'DUPLICATE_LINKED',
+      after: `Linked with ${b.ticketId}`,
+      reason,
+    })
+    await logActivity({
+      issue: b._id,
+      actor: req.user._id,
+      action: 'DUPLICATE_LINKED',
+      after: `Linked with ${a.ticketId}`,
+      reason,
+    })
+
+    res.status(200).json({ message: 'Tickets linked' })
+  } catch (error) {
+    serverError(res, error)
+  }
+}
+
+module.exports = { updateStatus, assignIssue, changePriority, listStaff, linkDuplicate }

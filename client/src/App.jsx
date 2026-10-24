@@ -9,6 +9,7 @@ import Report from './pages/Report'
 import IssueDetail from './pages/IssueDetail'
 import Summary from './pages/Summary'
 import AdminAnalytics from './pages/AdminAnalytics'
+import StaffAdmin from './pages/StaffAdmin'
 
 function Protected({ roles, children }) {
   const { user } = useAuth()
@@ -45,6 +46,7 @@ export default function App() {
             <Route path="/admin/issues" element={guard(['admin'],
               <IssueTable title="All Issues" filters={['status', 'priority', 'department', 'overdue']} />)} />
             <Route path="/admin/analytics" element={guard(['admin'], <AdminAnalytics />)} />
+            <Route path="/admin/staff" element={guard(['admin'], <StaffAdmin />)} />
           </Route>
           <Route path="*" element={<AccessDenied />} />
         </Routes>

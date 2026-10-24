@@ -7,6 +7,7 @@ import {
   DEPT_LABEL, STATUS_LABEL, PRIORITIES, fmt,
   StatusBadge, PriorityBadge, Loading, ErrorBox,
 } from '../ui'
+import DuplicatesBox from '../components/DuplicatesBox'
 
 export default function IssueDetail() {
   const { id } = useParams()
@@ -158,6 +159,7 @@ export default function IssueDetail() {
         </p>
         {issue.needsReview && <p className="font-semibold">Needs Review: the model was not sure.</p>}
       </div>
+        <DuplicatesBox issue={issue} isAdmin={isAdmin} onChanged={load} />
 
       <div className={box}>
         <h2 className="font-semibold mb-2">Why this priority? (score {issue.priorityScore})</h2>

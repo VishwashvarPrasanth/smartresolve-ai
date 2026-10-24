@@ -40,7 +40,20 @@ const issueSchema = new mongoose.Schema(
     closedAt: { type: Date },
     resolutionNote: { type: String },
 
-    duplicateLinks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Issue' }],
+        // Suggestions made by the server when the ticket was created (safe summary only)
+    duplicateSuggestions: [
+      {
+        _id: false,
+        issue: { type: mongoose.Schema.Types.ObjectId, ref: 'Issue' },
+        ticketId: { type: String },
+        title: { type: String },
+        building: { type: String },
+        room: { type: String },
+        status: { type: String },
+        score: { type: Number },
+        reasons: [{ type: String }],
+      },
+    ],
   },
   { timestamps: true }
 )
